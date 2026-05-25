@@ -153,53 +153,28 @@ async function runDAIngestion() {
         const isRice = item.commodity.toLowerCase().includes('rice') || 
                        item.commodity.toLowerCase().includes('milled') || 
                        item.category.toLowerCase().includes('rice');
-        const isSardine = item.commodity.toLowerCase().includes('sardine');
-        const isNoodle = item.commodity.toLowerCase().includes('noodle');
 
-        if (!isRice && !isSardine && !isNoodle) continue;
+        if (!isRice) continue;
 
         const priceFloat = parseFloat(item.price.replace(/,/g, ''));
         if (isNaN(priceFloat)) continue;
 
         // Normalizing the names and setting the multipliers
         let normalizedName = item.commodity;
-        let base_unit_multiplier = 1;
-        let icon_slug = "default";
-        let category = item.category || 'General';
+        let base_unit_multiplier = 50;
+        let icon_slug = "rice-sack";
+        let category = "Agriculture/Food";
 
-        if (isRice) {
-            if (normalizedName.toLowerCase().includes('well milled') || normalizedName.toLowerCase().includes('well-milled')) {
-                normalizedName = "Well-Milled Rice";
-            } else if (normalizedName.toLowerCase().includes('regular milled') || normalizedName.toLowerCase().includes('regular-milled')) {
-                normalizedName = "Regular Milled Rice";
-            } else {
-                // Ignore specialty/luxury/non-essential rice varieties (Basmati, Japonica, etc.)
-                continue;
-            }
-            category = "Agriculture/Food";
-        } else if (isSardine) {
-            normalizedName = "Canned Sardines";
-            category = "Food & Groceries";
-        } else if (isNoodle) {
-            normalizedName = "Instant Noodles";
-            category = "Food & Groceries";
+        if (normalizedName.toLowerCase().includes('well milled') || normalizedName.toLowerCase().includes('well-milled')) {
+            normalizedName = "Well-Milled Rice";
+        } else if (normalizedName.toLowerCase().includes('regular milled') || normalizedName.toLowerCase().includes('regular-milled')) {
+            normalizedName = "Regular Milled Rice";
+        } else {
+            // Ignore specialty/luxury/non-essential rice varieties (Basmati, Japonica, etc.)
+            continue;
         }
 
-        let display_unit_name = "1 unit of " + normalizedName;
-
-        if (isRice) {
-            display_unit_name = "50kg Sack of " + normalizedName;
-            base_unit_multiplier = 50;
-            icon_slug = "rice-sack";
-        } else if (isSardine) {
-            display_unit_name = "Can of Sardines (155g)";
-            base_unit_multiplier = 1;
-            icon_slug = "sardines-can";
-        } else if (isNoodle) {
-            display_unit_name = "Instant Noodle Packet";
-            base_unit_multiplier = 1;
-            icon_slug = "noodles-pack";
-        }
+        let display_unit_name = "50kg Sack of " + normalizedName;
 
         try {
             await prisma.commodity.upsert({

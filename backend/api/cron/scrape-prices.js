@@ -133,40 +133,26 @@ async function runDAIngestion() {
 
   for (const item of parsedData.data) {
     const isRice = item.commodity.toLowerCase().includes('rice') || item.commodity.toLowerCase().includes('milled') || item.category.toLowerCase().includes('rice');
-    const isSardine = item.commodity.toLowerCase().includes('sardine');
-    const isNoodle = item.commodity.toLowerCase().includes('noodle');
 
-    if (!isRice && !isSardine && !isNoodle) continue;
+    if (!isRice) continue;
 
     const priceFloat = parseFloat(item.price.replace(/,/g, ''));
     if (isNaN(priceFloat)) continue;
 
     let normalizedName = item.commodity;
-    let base_unit_multiplier = 1;
-    let icon_slug = "default";
-    let category = item.category || 'General';
+    let base_unit_multiplier = 50;
+    let icon_slug = "rice-sack";
+    let category = "Agriculture/Food";
 
-    if (isRice) {
-      if (normalizedName.toLowerCase().includes('well milled') || normalizedName.toLowerCase().includes('well-milled')) {
-        normalizedName = "Well-Milled Rice";
-      } else if (normalizedName.toLowerCase().includes('regular milled') || normalizedName.toLowerCase().includes('regular-milled')) {
-        normalizedName = "Regular Milled Rice";
-      } else {
-        continue;
-      }
-      category = "Agriculture/Food";
-    } else if (isSardine) {
-      normalizedName = "Canned Sardines";
-      category = "Food & Groceries";
-    } else if (isNoodle) {
-      normalizedName = "Instant Noodles";
-      category = "Food & Groceries";
+    if (normalizedName.toLowerCase().includes('well milled') || normalizedName.toLowerCase().includes('well-milled')) {
+      normalizedName = "Well-Milled Rice";
+    } else if (normalizedName.toLowerCase().includes('regular milled') || normalizedName.toLowerCase().includes('regular-milled')) {
+      normalizedName = "Regular Milled Rice";
+    } else {
+      continue;
     }
 
-    let display_unit_name = "1 unit of " + normalizedName;
-    if (isRice) { display_unit_name = "50kg Sack of " + normalizedName; base_unit_multiplier = 50; icon_slug = "rice-sack"; }
-    else if (isSardine) { display_unit_name = "Can of Sardines (155g)"; icon_slug = "sardines-can"; }
-    else if (isNoodle) { display_unit_name = "Instant Noodle Packet"; icon_slug = "noodles-pack"; }
+    let display_unit_name = "50kg Sack of " + normalizedName;
 
     try {
       await prisma.commodity.upsert({
@@ -174,7 +160,7 @@ async function runDAIngestion() {
         update: { base_price_php: priceFloat },
         create: {
           name: normalizedName, category, base_price_php: priceFloat,
-          unit_of_measurement: isRice ? 'kg' : 'pcs',
+          unit_of_measurement: 'kg',
           base_unit_multiplier, display_unit_name, icon_slug,
           effective_date: effectiveDate, source_url: latestLink.url
         }

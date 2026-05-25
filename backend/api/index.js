@@ -69,6 +69,16 @@ app.get('/api/anomalies', authenticate, async (req, res) => {
     }
 });
 
+const ESSENTIAL_COMMODITIES = [
+    "Well-Milled Rice",
+    "Canned Sardines",
+    "Instant Noodles",
+    "Daily Minimum Wage (NCR)",
+    "Classroom Construction",
+    "DepEd Textbook",
+    "PhilHealth Monthly Premium"
+];
+
 app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
     try {
         const { anomalyId } = req.params;
@@ -76,6 +86,11 @@ app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
         if (!anomaly) return res.status(404).json({ error: 'Anomaly not found' });
 
         const latestCommodities = await prisma.commodity.findMany({
+            where: {
+                name: {
+                    in: ESSENTIAL_COMMODITIES
+                }
+            },
             orderBy: { effective_date: 'desc' },
             distinct: ['name']
         });
@@ -117,6 +132,11 @@ app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
 app.get('/api/commodities', authenticate, async (req, res) => {
     try {
         const latestCommodities = await prisma.commodity.findMany({
+            where: {
+                name: {
+                    in: ESSENTIAL_COMMODITIES
+                }
+            },
             orderBy: { effective_date: 'desc' },
             distinct: ['name']
         });

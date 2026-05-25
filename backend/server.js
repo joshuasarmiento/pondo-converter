@@ -73,6 +73,16 @@ app.get('/api/anomalies', authenticate, async (req, res) => {
     }
 });
 
+const ESSENTIAL_COMMODITIES = [
+    "Well-Milled Rice",
+    "Canned Sardines",
+    "Instant Noodles",
+    "Daily Minimum Wage (NCR)",
+    "Classroom Construction",
+    "DepEd Textbook",
+    "PhilHealth Monthly Premium"
+];
+
 // 2. The Core Conversion Engine (Generates the Receipt Data)
 app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
     try {
@@ -88,6 +98,11 @@ app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
         // Fetch the latest prices for our standard basket of goods
         // Using a raw query or distinct to get the most recent entries per commodity name
         const latestCommodities = await prisma.commodity.findMany({
+            where: {
+                name: {
+                    in: ESSENTIAL_COMMODITIES
+                }
+            },
             orderBy: { effective_date: 'desc' },
             distinct: ['name']
         });
@@ -135,6 +150,11 @@ app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
 app.get('/api/commodities', authenticate, async (req, res) => {
     try {
         const latestCommodities = await prisma.commodity.findMany({
+            where: {
+                name: {
+                    in: ESSENTIAL_COMMODITIES
+                }
+            },
             orderBy: { effective_date: 'desc' },
             distinct: ['name']
         });
