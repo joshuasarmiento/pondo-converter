@@ -86,10 +86,54 @@ const getIcon = (slug: string) => {
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="loading" class="py-20 flex flex-col items-center justify-center gap-3">
-      <div class="w-10 h-10 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
-      <span class="text-sm font-semibold text-slate-600">Loading live database baselines...</span>
+    <!-- Skeleton Loading State -->
+    <div v-if="loading">
+      <!-- Info banner skeleton -->
+      <div class="skeleton-block rounded-2xl h-16 mb-6 md:mb-8"></div>
+
+      <!-- Mobile card skeletons -->
+      <div class="grid grid-cols-1 gap-4 md:hidden">
+        <div v-for="n in 5" :key="n" class="bg-white border border-slate-100 rounded-2xl p-5 flex flex-col gap-4">
+          <div class="flex items-center gap-3">
+            <div class="skeleton-block w-10 h-10 rounded-xl"></div>
+            <div class="flex-1 space-y-2">
+              <div class="skeleton-block h-4 w-3/4 rounded"></div>
+              <div class="skeleton-block h-3 w-1/3 rounded-full"></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 border-y border-slate-100 py-3">
+            <div class="skeleton-block h-8 rounded"></div>
+            <div class="skeleton-block h-8 rounded"></div>
+          </div>
+          <div class="flex justify-between">
+            <div class="skeleton-block h-3 w-24 rounded"></div>
+            <div class="skeleton-block h-3 w-20 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop table skeleton -->
+      <div class="hidden md:block bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <!-- Table header -->
+        <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 grid grid-cols-6 gap-4">
+          <div v-for="n in 6" :key="n" class="skeleton-block h-3 rounded"></div>
+        </div>
+        <!-- Table rows -->
+        <div v-for="n in 7" :key="n" class="border-b border-slate-100 px-6 py-4 grid grid-cols-6 gap-4 items-center">
+          <div class="flex items-center gap-3">
+            <div class="skeleton-block w-8 h-8 rounded-lg shrink-0"></div>
+            <div class="skeleton-block h-4 flex-1 rounded"></div>
+          </div>
+          <div class="skeleton-block h-5 w-20 rounded-full"></div>
+          <div class="skeleton-block h-4 rounded"></div>
+          <div class="skeleton-block h-4 rounded"></div>
+          <div class="skeleton-block h-4 w-24 rounded"></div>
+          <div class="space-y-1.5">
+            <div class="skeleton-block h-3 w-28 rounded"></div>
+            <div class="skeleton-block h-3 w-20 rounded"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
@@ -225,17 +269,19 @@ const getIcon = (slug: string) => {
 </template>
 
 <style scoped>
-.animate-spin {
-  animation: spin 0.8s linear infinite;
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+.skeleton-block {
+  background: linear-gradient(
+    90deg,
+    #e2e8f0 25%,
+    #f1f5f9 50%,
+    #e2e8f0 75%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 </style>

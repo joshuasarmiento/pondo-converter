@@ -570,10 +570,41 @@ const shareAllocationReceipt = async () => {
             </button>
           </div>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="py-20 flex flex-col items-center justify-center gap-3">
-            <div class="w-10 h-10 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
-            <span class="text-sm font-semibold text-slate-600">Recomputing equivalent conversions...</span>
+          <!-- Skeleton Loading State -->
+          <div v-if="loading" class="space-y-3">
+            <!-- Tab bar skeleton -->
+            <div class="flex gap-2 mb-2">
+              <div class="skeleton-block flex-1 h-9 rounded-lg"></div>
+              <div class="skeleton-block flex-1 h-9 rounded-lg"></div>
+            </div>
+            <!-- Receipt skeleton -->
+            <div class="bg-amber-50/20 border border-slate-200/60 rounded-2xl p-5 md:p-7 space-y-4">
+              <!-- Receipt header -->
+              <div class="text-center space-y-2 pb-4 border-b border-dashed border-slate-300">
+                <div class="skeleton-block h-3 w-36 rounded mx-auto"></div>
+                <div class="skeleton-block h-2 w-48 rounded mx-auto"></div>
+              </div>
+              <!-- Amount block -->
+              <div class="text-center py-3 space-y-2">
+                <div class="skeleton-block h-8 w-52 rounded mx-auto"></div>
+                <div class="skeleton-block h-3 w-64 rounded mx-auto"></div>
+              </div>
+              <!-- Line items -->
+              <div class="border-t border-dashed border-slate-200 pt-4 space-y-3">
+                <div v-for="n in 5" :key="n" class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-2">
+                    <div class="skeleton-block w-6 h-6 rounded-full shrink-0"></div>
+                    <div class="skeleton-block h-3 w-36 rounded"></div>
+                  </div>
+                  <div class="skeleton-block h-4 w-20 rounded"></div>
+                </div>
+              </div>
+              <!-- Footer barcode area -->
+              <div class="border-t border-dashed border-slate-300 pt-4 space-y-2">
+                <div class="skeleton-block h-8 w-full rounded"></div>
+                <div class="skeleton-block h-2 w-24 rounded mx-auto"></div>
+              </div>
+            </div>
           </div>
 
           <div v-else>
@@ -838,17 +869,24 @@ const shareAllocationReceipt = async () => {
 </template>
 
 <style scoped>
-.animate-spin {
-  animation: spin 0.8s linear infinite;
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.skeleton-block {
+  background: linear-gradient(
+    90deg,
+    #e2e8f0 25%,
+    #f1f5f9 50%,
+    #e2e8f0 75%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 </style>
