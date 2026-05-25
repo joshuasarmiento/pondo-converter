@@ -64,9 +64,9 @@ const getIcon = (slug: string) => {
 <template>
   <div class="max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-0">
     <div class="mb-6 md:mb-8 text-center md:text-left">
-      <h1 class="text-2xl md:text-3xl font-extrabold text-blue-900 tracking-tight">Direktoryo ng mga Presyo (Baseline Prices)</h1>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-blue-900 tracking-tight">Commodity Prices (Baselines)</h1>
       <p class="text-slate-500 mt-2 max-w-xl text-sm md:text-base">
-        Dito niyo makikita ang baseline prices ng mga commodities at public services na ginagamit natin para sa conversion at simulation.
+        Baseline prices of commodities and public services used for conversions.
       </p>
     </div>
 
@@ -82,7 +82,7 @@ const getIcon = (slug: string) => {
           </span>
           <span class="text-emerald-700 text-[11px]">Live Data Active</span>
         </h4>
-        Ang presyo ng pagkain (tulad ng bigas) ay kinukuha mula sa price updates ng Department of Agriculture (DA). Ang industrial parameters naman tulad ng NCR Minimum Wages at classroom construction cost ay ina-update base sa report ng DOLE at DepEd.
+        Food prices (like rice) are sourced from Department of Agriculture (DA) price updates. Industrial parameters like NCR Minimum Wages and classroom construction costs are based on DOLE and DepEd reports.
       </div>
     </div>
 

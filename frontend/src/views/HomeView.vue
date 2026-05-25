@@ -380,21 +380,21 @@ const shareAllocationReceipt = async () => {
         <div v-if="!isCustomMode" class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
           <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Search class="w-5 h-5 text-blue-900" />
-            Pampublikong Database
+            Public Contract Database
           </h2>
           <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-            Mag-search at pumili ng verified public contract mula sa PhilGEPS system.
+            Search and select a verified public contract from the PhilGEPS procurement system.
           </p>
 
           <!-- Search Input -->
           <div class="mt-5">
             <label for="anomaly-search"
               class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
-              Mag-search ng Contracts
+              Search Contracts
             </label>
             <div class="relative">
               <input id="anomaly-search" type="text" v-model="searchQuery"
-                placeholder="Search ng agency, contractor, o title..."
+                placeholder="Search by agency, contractor, or project title..."
                 class="w-full border border-slate-300 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-white placeholder-slate-400" />
               <Search class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
             </div>
@@ -403,7 +403,7 @@ const shareAllocationReceipt = async () => {
           <div class="mt-4">
             <label for="anomaly-select"
               class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
-              Pumili ng Proyekto ({{ anomalies.length }} matches)
+              Select a Project ({{ anomalies.length }} results)
             </label>
             <select id="anomaly-select" v-model="selectedAnomalyId"
               class="w-full border border-slate-300 rounded-xl py-3 px-4 text-sm font-medium focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-white">
@@ -454,7 +454,7 @@ const shareAllocationReceipt = async () => {
                 <span class="font-bold block text-slate-900">Source Link</span>
                 <a :href="selectedAnomalyData.anomaly.source" target="_blank"
                   class="text-blue-900 hover:underline flex items-center gap-1 mt-1 font-semibold">
-                  Tingnan ang official record
+                  View official record
                   <ExternalLink class="w-3 h-3" />
                 </a>
               </div>
@@ -469,7 +469,7 @@ const shareAllocationReceipt = async () => {
             Budget Simulator
           </h2>
           <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-            Mag-enter ng kahit anong budget amount para ma-simulate ang mga pwedeng pambili nito.
+            Enter any budget amount to simulate its purchasing power.
           </p>
 
           <div class="mt-5">

@@ -7,8 +7,7 @@ import { ShieldCheck, Info, HelpCircle } from 'lucide-vue-next';
     <div class="mb-8 text-center md:text-left">
       <h1 class="text-3xl font-black text-blue-900 tracking-tight">About Pondo Converter</h1>
       <p class="text-slate-600 mt-2 text-sm md:text-base leading-relaxed">
-        A civic tech tool designed to translate government budgets and contract allocations into physical,
-        everyday items that are easy to understand for the ordinary Filipino.
+        A civic tech tool designed to translate government budgets and contract allocations into everyday items to help citizens understand the true scale of public spending.
       </p>
     </div>
 
@@ -19,10 +18,7 @@ import { ShieldCheck, Info, HelpCircle } from 'lucide-vue-next';
         Where does the budget go?
       </h2>
       <p class="text-xs md:text-sm leading-relaxed">
-        Kapag may naririnig tayong bilyun-bilyong pisong budget para sa mga government projects, madalas mahirap
-        ma-visualize kung gaano talaga ito kalaki.
-        Ang goal ng tool na ito ay ipakita ang <strong>opportunity cost</strong> — basically, kung ginamit ang pondo sa
-        ibang paraan, gaano karaming sacks of rice, classrooms, textbooks, o days of minimum wage ang katumbas nito?
+        When we hear about billion-peso government budgets, it's hard to visualize the true scale. This tool shows the <strong>opportunity cost</strong> — if the funds were used differently, how many sacks of rice, classrooms, or textbooks could it have funded?
       </p>
     </div>
 
@@ -30,32 +26,25 @@ import { ShieldCheck, Info, HelpCircle } from 'lucide-vue-next';
     <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-8">
       <h3 class="font-bold text-slate-900 text-sm md:text-base mb-4 flex items-center gap-2">
         <ShieldCheck class="w-5 h-5 text-blue-900" />
-        Saan galing ang data?
+        Where does the data come from?
       </h3>
       <div class="space-y-4 text-xs md:text-sm text-slate-700">
         <div class="flex gap-3">
           <span class="w-2 h-2 rounded-full bg-blue-900 shrink-0 mt-1.5"></span>
           <p>
-            <strong>Government Contracts:</strong> Straight from the official <strong>PhilGEPS Open Data
-              Portal</strong>. Sinala natin ang top contracts na may malalaking halaga para makita ang direct impact
-            nito kapag isinalin sa mga pampublikong bilihin at serbisyo.
+            <strong>Government Contracts:</strong> Straight from the official <strong>PhilGEPS Open Data Portal</strong>. We filtered high-value contracts to show their direct impact when translated to public goods and services.
           </p>
         </div>
         <div class="flex gap-3">
           <span class="w-2 h-2 rounded-full bg-blue-900 shrink-0 mt-1.5"></span>
           <p>
-            <strong>Market Prices of Goods:</strong> Ang presyo ng basic items tulad ng rice, canned sardines, at
-            instant noodles ay regular na ina-update base sa price bulletins ng <strong>Department of Agriculture (DA)
-              Bantay Presyo</strong> at <strong>DTI Suggested Retail Price (SRP)</strong>.
+            <strong>Market Prices of Goods:</strong> Prices for basic items like rice, canned sardines, and instant noodles are updated based on price bulletins from the <strong>Department of Agriculture (DA)</strong> and <strong>DTI Suggested Retail Price (SRP)</strong>.
           </p>
         </div>
         <div class="flex gap-3">
           <span class="w-2 h-2 rounded-full bg-blue-900 shrink-0 mt-1.5"></span>
           <p>
-            <strong>Wages, Classrooms, & Healthcare:</strong> Ang NCR Minimum Wage is set to <strong>₱610/day</strong>.
-            Ang pampublikong silid-aralan naman ay estimated sa <strong>₱2.5 Million each</strong> (based on DepEd
-            standards), textbooks are set to <strong>₱150 each</strong>, at ang PhilHealth contribution is pegged at
-            <strong>₱500/month</strong>.
+            <strong>Wages, Classrooms, & Healthcare:</strong> NCR Minimum Wage is set to <strong>₱610/day</strong>. A public school classroom is estimated at <strong>₱2.5 Million each</strong> (based on DepEd standards), textbooks are <strong>₱150 each</strong>, and PhilHealth contribution is pegged at <strong>₱500/month</strong>.
           </p>
         </div>
       </div>
@@ -71,9 +60,7 @@ import { ShieldCheck, Info, HelpCircle } from 'lucide-vue-next';
       <div class="space-y-4 text-xs md:text-sm">
         <div>
           <h4 class="font-bold text-slate-900">Who made this tool?</h4>
-          <p class="text-slate-600 mt-0.5">
-            Ito ay isang independent civic tech project created for public education and budget transparency.
-          </p>
+            This is an independent civic tech project created for public education and budget transparency.
         </div>
 
         <div>
@@ -87,7 +74,7 @@ import { ShieldCheck, Info, HelpCircle } from 'lucide-vue-next';
         <div>
           <h4 class="font-bold text-slate-900">What do "Flagged" and "Awarded" statuses mean?</h4>
           <p class="text-slate-600 mt-0.5">
-            <strong>Awarded</strong> means na-approve at naibigay na ang contract sa winning contractor.
+            <strong>Awarded</strong> means the contract has been approved and awarded to the winning contractor.
             <strong>Flagged</strong> contracts are those highlighted in official audit reports (like COA) or news
             reports due to pricing issues or procedural irregularities.
           </p>

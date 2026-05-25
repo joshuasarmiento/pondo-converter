@@ -23,8 +23,7 @@ router.afterEach(() => { setTimeout(() => { isRouteLoading.value = false; }, 150
           </div>
           <h1 class="text-3xl font-bold mt-1 tracking-tight">Pondo Converter</h1>
           <p class="text-blue-100/80 text-sm mt-1 max-w-xl">
-            Isinasalin natin ang government budgets at contract allocations sa mga pampublikong bilihin at serbisyo para
-            ma-compute ang civic opportunity cost.
+            See what government contracts could have funded — in rice, classrooms, wages, and more.
           </p>
         </div>
 
@@ -39,7 +38,7 @@ router.afterEach(() => { setTimeout(() => { isRouteLoading.value = false; }, 150
           <router-link to="/prices"
             class="px-4 py-2 rounded-md text-sm font-semibold transition text-slate-300 hover:text-white"
             active-class="bg-blue-900 text-white shadow-sm">
-            Presyo ng Bilihin
+            Commodity Prices
           </router-link>
           <router-link to="/about"
             class="px-4 py-2 rounded-md text-sm font-semibold transition text-slate-300 hover:text-white"
@@ -100,7 +99,9 @@ router.afterEach(() => { setTimeout(() => { isRouteLoading.value = false; }, 150
         <div class="text-left">
           <p>© 2026 Pondo Converter. Open Data & Civic Tech Platform.</p>
           <p class="text-[10px] text-slate-400 mt-1 max-w-2xl leading-normal">
-            Disclaimer: This is an independent civic tech tool developed for educational and transparency purposes. It is not affiliated with, sponsored by, endorsed by, or in any way officially connected to the Commission on Audit (COA), PhilGEPS, or any government agency of the Republic of the Philippines.
+            Disclaimer: This is an independent civic tech tool developed for educational and transparency purposes. It
+            is not affiliated with, sponsored by, endorsed by, or in any way officially connected to the Commission on
+            Audit (COA), PhilGEPS, or any government agency of the Republic of the Philippines.
           </p>
         </div>
         <div class="flex gap-4 shrink-0 font-semibold">
@@ -122,18 +123,21 @@ body {
 
 /* Skeleton shimmer animation */
 @keyframes shimmer {
-  0%   { background-position: -600px 0; }
-  100% { background-position: 600px 0; }
+  0% {
+    background-position: -600px 0;
+  }
+
+  100% {
+    background-position: 600px 0;
+  }
 }
 
 .skeleton-bar,
 .skeleton-card {
-  background: linear-gradient(
-    90deg,
-    #e2e8f0 25%,
-    #f1f5f9 50%,
-    #e2e8f0 75%
-  );
+  background: linear-gradient(90deg,
+      #e2e8f0 25%,
+      #f1f5f9 50%,
+      #e2e8f0 75%);
   background-size: 600px 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
@@ -147,6 +151,7 @@ body {
 .skeleton-fade-leave-active {
   transition: opacity 0.15s ease;
 }
+
 .skeleton-fade-enter-from,
 .skeleton-fade-leave-to {
   opacity: 0;
@@ -156,6 +161,7 @@ body {
 .page-fade-enter-active {
   transition: opacity 0.2s ease;
 }
+
 .page-fade-enter-from {
   opacity: 0;
 }
