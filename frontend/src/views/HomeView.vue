@@ -632,8 +632,8 @@ const shareAllocationReceipt = async () => {
           <h4 class="font-bold text-blue-900 flex items-center gap-1.5 mb-1.5 uppercase tracking-wider text-[10px]">
             Methodology & Prices
           </h4>
-          Ang calculations ay base sa latest market prices mula sa DA, DTI, at DepEd. Regular na ina-update ang data
-          para sa transparency ng bayan.
+          Calculations are based on the latest market prices from the DA, DTI, and DepEd. Data is regularly updated
+          for public transparency.
         </div>
       </section>
 
