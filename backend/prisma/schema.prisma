@@ -1,0 +1,39 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Commodity {
+  id                   String   @id @default(uuid())
+  name                 String
+  category             String
+  base_price_php       Float
+  unit_of_measurement  String
+  base_unit_multiplier Float
+  display_unit_name    String
+  icon_slug            String
+  effective_date       DateTime
+  source_url           String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([name, effective_date])
+}
+
+model Anomaly {
+  id                    String    @id @default(uuid())
+  title                 String
+  agency                String
+  contract_amount_php   Float
+  date_awarded          DateTime?
+  contractor_name       String?
+  philgeps_reference_no String?   @unique
+  source_url            String
+  status                String    @default("Awarded")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
