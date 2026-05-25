@@ -232,7 +232,7 @@ const autoFocusEducation = () => {
   resetAllocations();
   const classrooms = commoditiesList.value.find(i => i.icon_slug === 'classroom');
   const textbooks = commoditiesList.value.find(i => i.icon_slug === 'textbook');
-  
+
   if (classrooms) {
     const unitCost = classrooms.base_price_php * classrooms.base_unit_multiplier;
     const amt = displayAmount.value * 0.75;
@@ -248,7 +248,7 @@ const autoFocusEducation = () => {
 
 const autoFocusFoodWages = () => {
   resetAllocations();
-  const targets = commoditiesList.value.filter(i => 
+  const targets = commoditiesList.value.filter(i =>
     ['rice-sack', 'sardines-can', 'noodles-pack', 'daily-wage'].includes(i.icon_slug)
   );
   if (targets.length === 0) return;
@@ -263,7 +263,7 @@ const shareReceipt = async () => {
   const title = displayTitle.value;
   const agency = displayAgency.value;
   const amountStr = formatPHP(displayAmount.value);
-  
+
   let conversionText = "";
   filteredAndSortedConversions.value.forEach(item => {
     conversionText += `• ${item.metric_name}: ${formatNumber(item.quantity_equivalent)} units equivalent (at ${formatPHP(item.unit_cost)} each)\n`;
@@ -293,7 +293,7 @@ const shareAllocationReceipt = async () => {
   const title = displayTitle.value;
   const agency = displayAgency.value;
   const amountStr = formatPHP(displayAmount.value);
-  
+
   let allocationText = "";
   commoditiesList.value.forEach(item => {
     const qty = allocations.value[item.name] || 0;
@@ -430,7 +430,7 @@ const shareAllocationReceipt = async () => {
               <p class="text-2xl font-bold text-blue-900 mt-0.5">{{ formatPHP(selectedAnomalyData.anomaly.amount_php) }}
               </p>
             </div>
-            <div v-if="selectedAnomalyData.anomaly.status">
+            <div v-if="selectedAnomalyData.anomaly.status" class="flex justify-start items-center gap-2">
               <span class="text-xs font-semibold text-slate-500 uppercase block tracking-wider">Status / Stage</span>
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold mt-1" :class="[
                 selectedAnomalyData.anomaly.status.toLowerCase().includes('fail') || selectedAnomalyData.anomaly.status.toLowerCase().includes('investig') || selectedAnomalyData.anomaly.status.toLowerCase().includes('flag') || selectedAnomalyData.anomaly.status.toLowerCase().includes('audit')
@@ -514,7 +514,8 @@ const shareAllocationReceipt = async () => {
           <h4 class="font-bold text-blue-900 flex items-center gap-1.5 mb-1.5 uppercase tracking-wider text-[10px]">
             Methodology & Prices
           </h4>
-          Ang calculations ay base sa latest market prices mula sa DA, DTI, at DepEd. Regular na ina-update ang data para sa transparency ng bayan.
+          Ang calculations ay base sa latest market prices mula sa DA, DTI, at DepEd. Regular na ina-update ang data
+          para sa transparency ng bayan.
         </div>
       </section>
 
@@ -541,7 +542,8 @@ const shareAllocationReceipt = async () => {
               </div>
             </div>
             <div class="text-left md:text-right shrink-0">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Total Allocated Pondo</span>
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Total Allocated
+                Pondo</span>
               <span class="text-3xl font-extrabold text-blue-900 block mt-1">
                 {{ formatPHP(displayAmount) }}
               </span>
@@ -610,22 +612,28 @@ const shareAllocationReceipt = async () => {
           <div v-else>
             <!-- Tab 1: The Monospace Thermal Receipt Theme -->
             <div v-if="activeTab === 'receipt'" class="flex flex-col gap-4">
-              <div class="relative bg-amber-50/20 text-slate-800 font-mono p-5 md:p-7 rounded-2xl border border-slate-200/60 shadow-xs">
+              <div
+                class="relative bg-amber-50/20 text-slate-800 font-mono p-5 md:p-7 rounded-2xl border border-slate-200/60 shadow-xs">
                 <!-- Thermal paper jagged top simulator -->
                 <div class="border-t-4 border-dashed border-slate-300 pt-5">
                   <div class="text-center mb-6">
                     <h3 class="font-bold text-xs uppercase tracking-widest text-slate-500">Official Cost Receipt</h3>
                     <p class="text-[10px] text-slate-400 mt-1">Civic Tech PH — Pondo Converter v1.3</p>
-                    <p class="text-[9px] text-slate-400 mt-0.5">Date: {{ new Date().toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) }}</p>
+                    <p class="text-[9px] text-slate-400 mt-0.5">Date: {{ new Date().toLocaleDateString('en-PH', {
+                      month:
+                        'short', day: 'numeric', year: 'numeric'
+                    }) }}</p>
                   </div>
 
-                  <div class="border-b border-dashed border-slate-200 pb-3 mb-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex justify-between">
+                  <div
+                    class="border-b border-dashed border-slate-200 pb-3 mb-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex justify-between">
                     <span>Opportunity Equivalents</span>
                     <span>Quantity & Valuation</span>
                   </div>
 
                   <!-- Filter & Sort Toolbar for Receipt -->
-                  <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 rounded-xl p-3 mb-4 font-sans text-xs">
+                  <div
+                    class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 rounded-xl p-3 mb-4 font-sans text-xs">
                     <!-- Filter Pills -->
                     <div class="flex flex-wrap items-center gap-1">
                       <button @click="activeCategory = 'all'" :class="['px-2 py-0.5 rounded-md text-[10px] font-bold transition border',
@@ -657,7 +665,8 @@ const shareAllocationReceipt = async () => {
                     <!-- Sort Select -->
                     <div class="flex items-center gap-1">
                       <label for="sort-select-r font-semibold" class="text-[10px]">Sort:</label>
-                      <select id="sort-select-r" v-model="sortBy" class="border border-slate-300 rounded text-[10px] py-0.5 px-1 bg-white text-slate-700 font-semibold focus:ring-0">
+                      <select id="sort-select-r" v-model="sortBy"
+                        class="border border-slate-300 rounded text-[10px] py-0.5 px-1 bg-white text-slate-700 font-semibold focus:ring-0">
                         <option value="quantity_desc">Qty (High)</option>
                         <option value="quantity_asc">Qty (Low)</option>
                         <option value="price_desc">Price (High)</option>
@@ -667,18 +676,23 @@ const shareAllocationReceipt = async () => {
                   </div>
 
                   <!-- Empty State -->
-                  <div v-if="filteredAndSortedConversions.length === 0" class="py-8 text-center text-xs text-slate-400 font-sans">
+                  <div v-if="filteredAndSortedConversions.length === 0"
+                    class="py-8 text-center text-xs text-slate-400 font-sans">
                     No commodities match this category filter.
                   </div>
 
                   <!-- Receipt Items -->
                   <div class="space-y-4">
-                    <div v-for="item in filteredAndSortedConversions" :key="item.metric_name" class="flex items-start justify-between gap-4 text-xs">
+                    <div v-for="item in filteredAndSortedConversions" :key="item.metric_name"
+                      class="flex items-start justify-between gap-4 text-xs">
                       <div class="flex items-start gap-2.5">
                         <component :is="getIcon(item.icon_slug)" class="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
                         <div>
                           <span class="font-bold text-slate-800">{{ item.metric_name }}</span>
-                          <span class="block text-[9px] text-slate-400 font-sans mt-0.5">Price: {{ formatPHP(item.unit_cost) }} each • As of {{ new Date(item.source_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) }}</span>
+                          <span class="block text-[9px] text-slate-400 font-sans mt-0.5">Price: {{
+                            formatPHP(item.unit_cost) }} each • As of {{ new
+                              Date(item.source_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                            }}</span>
                         </div>
                       </div>
                       <div class="text-right shrink-0">
@@ -689,19 +703,24 @@ const shareAllocationReceipt = async () => {
                   </div>
 
                   <!-- Barcode Simulation -->
-                  <div class="mt-8 pt-6 border-t border-dashed border-slate-300 flex flex-col items-center justify-center gap-1.5 opacity-75">
-                    <div class="flex items-center gap-[1px] h-8 w-44 overflow-hidden bg-white px-2 py-1 border border-slate-200">
-                      <div v-for="n in 25" :key="n" :class="['h-full bg-slate-800', n % 3 === 0 ? 'w-[3px]' : n % 2 === 0 ? 'w-[1px]' : 'w-[2px]']"></div>
+                  <div
+                    class="mt-8 pt-6 border-t border-dashed border-slate-300 flex flex-col items-center justify-center gap-1.5 opacity-75">
+                    <div
+                      class="flex items-center gap-[1px] h-8 w-44 overflow-hidden bg-white px-2 py-1 border border-slate-200">
+                      <div v-for="n in 25" :key="n"
+                        :class="['h-full bg-slate-800', n % 3 === 0 ? 'w-[3px]' : n % 2 === 0 ? 'w-[1px]' : 'w-[2px]']">
+                      </div>
                     </div>
-                    <span class="text-[8px] text-slate-500 tracking-widest uppercase">BETTERGOV-#{{ displayAmount.toString().substring(0, 6) }}</span>
+                    <span class="text-[8px] text-slate-500 tracking-widest uppercase">PC-#{{
+                      displayAmount.toString().substring(0, 6) }}</span>
                   </div>
 
                   <!-- Share Receipt Button at the Bottom -->
                   <div class="mt-6 pt-4 border-t border-dashed border-slate-200">
                     <button @click="shareReceipt" :class="[
                       'w-full py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer font-sans',
-                      copied 
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                      copied
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                         : 'bg-slate-900 border-slate-900 text-white hover:bg-slate-800 shadow-xs'
                     ]">
                       <Share2 class="w-3.5 h-3.5" />
@@ -715,7 +734,8 @@ const shareAllocationReceipt = async () => {
             <!-- Tab 2: The Interactive Budget Allocator Playground -->
             <div v-else class="flex flex-col gap-6">
               <!-- Budget Spent Summary Widget -->
-              <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center gap-6 justify-between shadow-xs">
+              <div
+                class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center gap-6 justify-between shadow-xs">
                 <div class="flex-1 w-full">
                   <div class="flex justify-between items-center text-xs font-bold text-slate-600 mb-2">
                     <span>BUDGET ALLOCATED SPENT</span>
@@ -725,7 +745,8 @@ const shareAllocationReceipt = async () => {
                   </div>
                   <!-- Custom CSS Progress Bar -->
                   <div class="w-full bg-slate-200 h-3.5 rounded-full overflow-hidden flex">
-                    <div class="bg-gradient-to-r from-blue-700 to-indigo-600 h-full transition-all duration-300" :style="{ width: percentAllocated + '%' }"></div>
+                    <div class="bg-gradient-to-r from-blue-700 to-indigo-600 h-full transition-all duration-300"
+                      :style="{ width: percentAllocated + '%' }"></div>
                   </div>
                   <div class="flex justify-between items-center text-[10px] font-semibold text-slate-400 mt-2">
                     <span>Allocated: {{ formatPHP(totalAllocatedCost) }}</span>
@@ -734,19 +755,23 @@ const shareAllocationReceipt = async () => {
                 </div>
                 <!-- Presets Buttons Panel -->
                 <div class="grid grid-cols-2 gap-2 w-full md:w-auto shrink-0">
-                  <button @click="autoDistributeEvenly" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
+                  <button @click="autoDistributeEvenly"
+                    class="px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
                     <Shuffle class="w-3.5 h-3.5 text-blue-900" />
                     Split Evenly
                   </button>
-                  <button @click="autoFocusEducation" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
+                  <button @click="autoFocusEducation"
+                    class="px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
                     <School class="w-3.5 h-3.5 text-blue-900" />
                     Education
                   </button>
-                  <button @click="autoFocusFoodWages" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
+                  <button @click="autoFocusFoodWages"
+                    class="px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
                     <Wheat class="w-3.5 h-3.5 text-blue-900" />
                     Food & Wages
                   </button>
-                  <button @click="resetAllocations" class="px-2.5 py-1.5 bg-red-50 border border-red-100 hover:border-red-200 rounded-lg text-[10px] font-bold text-red-700 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
+                  <button @click="resetAllocations"
+                    class="px-2.5 py-1.5 bg-red-50 border border-red-100 hover:border-red-200 rounded-lg text-[10px] font-bold text-red-700 flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer">
                     <RotateCcw class="w-3.5 h-3.5" />
                     Reset
                   </button>
@@ -755,7 +780,8 @@ const shareAllocationReceipt = async () => {
 
               <!-- Allocation Sliders Grid -->
               <div class="flex flex-col gap-4">
-                <div v-for="item in commoditiesList" :key="item.id" class="border border-slate-200 rounded-2xl p-4 flex flex-col gap-3.5 bg-white hover:border-slate-300 hover:shadow-2xs transition-all duration-300">
+                <div v-for="item in commoditiesList" :key="item.id"
+                  class="border border-slate-200 rounded-2xl p-4 flex flex-col gap-3.5 bg-white hover:border-slate-300 hover:shadow-2xs transition-all duration-300">
                   <div class="flex justify-between items-start gap-4">
                     <div class="flex items-center gap-3">
                       <div class="p-2 bg-slate-50 text-blue-900 rounded-xl border border-slate-100">
@@ -772,7 +798,8 @@ const shareAllocationReceipt = async () => {
                     <div class="text-right shrink-0">
                       <span class="text-xs font-bold text-slate-500 block">Total Spent</span>
                       <span class="text-sm font-black text-blue-900">
-                        {{ formatPHP((allocations[item.name] || 0) * (item.base_price_php * item.base_unit_multiplier)) }}
+                        {{ formatPHP((allocations[item.name] || 0) * (item.base_price_php * item.base_unit_multiplier))
+                        }}
                       </span>
                     </div>
                   </div>
@@ -782,43 +809,31 @@ const shareAllocationReceipt = async () => {
                     <!-- Slider (Responsive & constrained by remaining budget) -->
                     <div class="flex-1 flex items-center gap-3">
                       <span class="text-[10px] text-slate-400 font-bold w-4">0</span>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        :max="getMaxQuantity(item)" 
-                        :value="allocations[item.name] || 0"
+                      <input type="range" min="0" :max="getMaxQuantity(item)" :value="allocations[item.name] || 0"
                         @input="e => updateAllocationValue(item.name, parseInt((e.target as HTMLInputElement).value))"
-                        class="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-950"
-                      />
+                        class="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-950" />
                       <span class="text-[10px] text-slate-400 font-bold w-12 text-right">Max</span>
                     </div>
 
                     <!-- Direct quantity adjuster buttons + numeric input -->
-                    <div class="flex items-center justify-between sm:justify-start gap-2 bg-slate-50 border border-slate-200 rounded-xl p-1 shrink-0">
-                      <button 
-                        @click="updateAllocationValue(item.name, (allocations[item.name] || 0) - 1)"
+                    <div
+                      class="flex items-center justify-between sm:justify-start gap-2 bg-slate-50 border border-slate-200 rounded-xl p-1 shrink-0">
+                      <button @click="updateAllocationValue(item.name, (allocations[item.name] || 0) - 1)"
                         class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 flex items-center justify-center transition cursor-pointer shadow-3xs"
-                        :disabled="(allocations[item.name] || 0) <= 0"
-                      >
+                        :disabled="(allocations[item.name] || 0) <= 0">
                         <Minus class="w-3.5 h-3.5" />
                       </button>
 
-                      <input 
-                        type="number" 
-                        :value="allocations[item.name] || 0"
-                        @change="e => {
-                          const val = parseInt((e.target as HTMLInputElement).value) || 0;
-                          const max = getMaxQuantity(item);
-                          updateAllocationValue(item.name, Math.min(max, val));
-                        }"
-                        class="w-16 text-center border-0 bg-transparent text-xs font-black text-slate-900 focus:ring-0"
-                      />
+                      <input type="number" :value="allocations[item.name] || 0" @change="e => {
+                        const val = parseInt((e.target as HTMLInputElement).value) || 0;
+                        const max = getMaxQuantity(item);
+                        updateAllocationValue(item.name, Math.min(max, val));
+                      }"
+                        class="w-16 text-center border-0 bg-transparent text-xs font-black text-slate-900 focus:ring-0" />
 
-                      <button 
-                        @click="updateAllocationValue(item.name, (allocations[item.name] || 0) + 1)"
+                      <button @click="updateAllocationValue(item.name, (allocations[item.name] || 0) + 1)"
                         class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 flex items-center justify-center transition cursor-pointer shadow-3xs"
-                        :disabled="getMaxQuantity(item) <= (allocations[item.name] || 0)"
-                      >
+                        :disabled="getMaxQuantity(item) <= (allocations[item.name] || 0)">
                         <Plus class="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -830,8 +845,8 @@ const shareAllocationReceipt = async () => {
               <div class="mt-4 pt-4 border-t border-slate-100">
                 <button @click="shareAllocationReceipt" :class="[
                   'w-full py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer font-sans',
-                  copied 
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                  copied
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                     : 'bg-slate-900 border-slate-900 text-white hover:bg-slate-800 shadow-xs'
                 ]">
                   <Share2 class="w-3.5 h-3.5" />
@@ -870,23 +885,31 @@ const shareAllocationReceipt = async () => {
 
 <style scoped>
 @keyframes shimmer {
-  0%   { background-position: -600px 0; }
-  100% { background-position: 600px 0; }
+  0% {
+    background-position: -600px 0;
+  }
+
+  100% {
+    background-position: 600px 0;
+  }
 }
 
 .skeleton-block {
-  background: linear-gradient(
-    90deg,
-    #e2e8f0 25%,
-    #f1f5f9 50%,
-    #e2e8f0 75%
-  );
+  background: linear-gradient(90deg,
+      #e2e8f0 25%,
+      #f1f5f9 50%,
+      #e2e8f0 75%);
   background-size: 600px 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
