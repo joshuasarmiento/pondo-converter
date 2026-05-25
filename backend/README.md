@@ -1,69 +1,46 @@
-# Pondo Converter — Backend
+# Backend
 
-The backend server for the Pondo Converter application. It connects to a Turso database using Prisma and serves API endpoints to fetch anomalies (with dynamic search filtering) and calculate opportunity cost conversions against a baseline basket of consumer commodities.
+Express API server na kumonekta sa Turso DB gamit ang Prisma. Nagse-serve ng endpoints para sa anomalies, conversions, at commodity prices. May built-in cron job para sa daily DA price scraping.
 
-## Technology Stack
+## Stack
 
-- **Runtime**: [Bun](https://bun.sh/) / [Node.js](https://nodejs.org/)
+- **Runtime**: Node.js / Bun
 - **Framework**: Express
-- **Database**: Turso (hosted LibSQL)
+- **Database**: Turso (LibSQL)
 - **ORM**: Prisma
-- **Data Query Engine**: Python 3 + DuckDB (for ingestion of the 500MB `philgeps.parquet` dataset)
 
-## Key Features
+## Setup
 
-1. **`GET /api/anomalies`**: Fetches the list of procurement anomalies or contracts. Supports an optional `?search=` query parameter that searches case-insensitively across project titles, procuring agencies, and contractor names.
-2. **`GET /api/convert/:anomalyId`**: Fetches details for a specific contract and calculates its value equivalent in terms of standard commodities (e.g., sacks of rice, NCR minimum wage days, public school classrooms, textbooks, and health coverage months).
-3. **Data Ingestion System**: Scripts to parse, filter, and upload 2,500 high-value records from the PhilGEPS Open Data parquet dataset.
-
-## Setup & Ingestion
-
-### 1. Installation
-Install Node dependencies:
 ```bash
 bun install
+cp .env.example .env   # fill in your credentials
+bun run db:push        # apply schema to Turso
+bun dev                # http://localhost:3001
 ```
 
-### 2. Database Configuration
-Create a `.env` file in the root of this folder with your database credentials:
-```env
-TURSO_DATABASE_URL="libsql://your-db-url.turso.io"
-TURSO_AUTH_TOKEN="your-auth-token"
-API_KEY="your-backend-api-key"
-PORT=3001
-```
+## API Endpoints
 
-Apply database migrations:
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/anomalies` | List contracts. Supports `?search=` |
+| GET | `/api/convert/:id` | Convert contract amount to commodity equivalents |
+| GET | `/api/commodities` | List latest commodity prices |
+| GET | `/api/cron/scrape-prices` | Manually trigger DA price scraper (needs `CRON_SECRET`) |
+
+## Environment Variables
+
+See [`.env.example`](./.env.example) for all required vars.
+
+## Data Ingestion (PhilGEPS)
+
+If you have `philgeps.parquet`:
+
 ```bash
-bun run db:push
+python3 -m venv venv && ./venv/bin/pip install duckdb
+./venv/bin/python extract_top_contracts.py
+node prisma/import_parquet.js
 ```
 
-### 3. PhilGEPS Dataset Ingestion
-If you have `philgeps.parquet` in this directory:
+## Cron Job
 
-1. Create a Python virtual environment and install DuckDB:
-   ```bash
-   python3 -m venv venv
-   ./venv/bin/pip install duckdb
-   ```
-2. Extract the top 2,500 contracts into a JSON format:
-   ```bash
-   ./venv/bin/python extract_top_contracts.py
-   ```
-3. Load the JSON data into the Turso database:
-   ```bash
-   node prisma/import_parquet.js
-   ```
-
-## Development
-
-Run the development server with live reload:
-```bash
-bun dev
-```
-
-The API will be available at `http://localhost:3001`.
-
-## Disclaimer
-
-This is an independent civic tech project developed for educational and public transparency purposes. It is not affiliated with, sponsored by, endorsed by, or in any way officially connected to the Commission on Audit (COA), PhilGEPS, the Department of Agriculture (DA), or any other agency of the Government of the Republic of the Philippines.
+The DA price scraper runs daily at **9:00 AM PHT** via Vercel Cron (`/api/cron/scrape-prices`). Protect it with `CRON_SECRET` in your env vars.
