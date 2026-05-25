@@ -1,8 +1,8 @@
 import { ref, watch } from 'vue';
 import type { Anomaly, Commodity, ConversionData } from '../types';
 
-const API_URL = 'http://localhost:3001/api';
-const API_KEY = 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_KEY = import.meta.env.VITE_API_KEY || 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
 
 export function usePondo() {
   const anomalies = ref<Anomaly[]>([]);
