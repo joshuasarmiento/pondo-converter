@@ -35,6 +35,11 @@ router.afterEach(() => { setTimeout(() => { isRouteLoading.value = false; }, 150
             active-class="bg-blue-900 text-white shadow-sm">
             Converter
           </router-link>
+          <router-link to="/analytics"
+            class="px-4 py-2 rounded-md text-sm font-semibold transition text-slate-300 hover:text-white"
+            active-class="bg-blue-900 text-white shadow-sm">
+            Civic Analytics
+          </router-link>
           <router-link to="/prices"
             class="px-4 py-2 rounded-md text-sm font-semibold transition text-slate-300 hover:text-white"
             active-class="bg-blue-900 text-white shadow-sm">
@@ -88,9 +93,11 @@ router.afterEach(() => { setTimeout(() => { isRouteLoading.value = false; }, 150
       </transition>
 
       <!-- Actual Page Content -->
-      <transition name="page-fade">
-        <router-view v-if="!isRouteLoading" />
-      </transition>
+      <router-view v-if="!isRouteLoading" v-slot="{ Component }">
+        <transition name="page-fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
 
     <!-- Footer -->

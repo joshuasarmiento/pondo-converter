@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
+import html2canvas from 'html2canvas-pro';
 import {
   ExternalLink,
   FileText,
@@ -20,7 +21,9 @@ import {
   Plus,
   RotateCcw,
   Sliders,
-  Shuffle
+  Shuffle,
+  Camera,
+  Users
 } from 'lucide-vue-next';
 import { usePondo } from '../composables/usePondo';
 
@@ -35,6 +38,7 @@ const {
   isCustomMode,
   customAmount,
   commoditiesList,
+  selectedRegion,
   loading,
   error,
   fetchAnomalies,
@@ -44,6 +48,98 @@ const {
 
 // Allocation dictionary: name -> quantity
 const allocations = ref<Record<string, number>>({});
+
+// Community Consensus data state
+const communityAverages = ref<Record<string, number>>({});
+const communitySubmissionsCount = ref(0);
+const loadingCommunityConsensus = ref(false);
+const publishedSuccess = ref(false);
+
+const fetchCommunityConsensus = async () => {
+  if (isCustomMode.value || !selectedAnomalyId.value) return;
+  loadingCommunityConsensus.value = true;
+  try {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    const API_KEY = import.meta.env.VITE_API_KEY || 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
+    const res = await fetch(`${API_URL}/reallocations/${selectedAnomalyId.value}`, {
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`
+      }
+    });
+    if (!res.ok) throw new Error('Failed to fetch consensus');
+    const data = await res.json();
+    communitySubmissionsCount.value = data.totalSubmissions;
+    communityAverages.value = data.averages;
+  } catch (e) {
+    console.error('Failed to load community consensus:', e);
+  } finally {
+    loadingCommunityConsensus.value = false;
+  }
+};
+
+const publishReallocation = async () => {
+  if (isCustomMode.value || !selectedAnomalyId.value) return;
+  try {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    const API_KEY = import.meta.env.VITE_API_KEY || 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
+
+    // Calculate percentage allocations for each item
+    const totalAllocated = totalAllocatedCost.value;
+    const allocationPercentages: Record<string, number> = {};
+    commoditiesList.value.forEach(item => {
+      const qty = allocations.value[item.name] || 0;
+      const cost = qty * item.base_price_php * item.base_unit_multiplier;
+      const pct = totalAllocated > 0 ? (cost / totalAllocated) * 100 : 0;
+      allocationPercentages[item.name] = pct;
+    });
+
+    const res = await fetch(`${API_URL}/reallocations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        anomalyId: selectedAnomalyId.value,
+        allocations: allocationPercentages
+      })
+    });
+    if (res.ok) {
+      publishedSuccess.value = true;
+      await fetchCommunityConsensus();
+      setTimeout(() => {
+        publishedSuccess.value = false;
+      }, 3000);
+    }
+  } catch (e) {
+    console.error('Failed to publish reallocation:', e);
+  }
+};
+
+const receiptContainer = ref<HTMLElement | null>(null);
+const exportingImage = ref(false);
+
+const downloadReceiptImage = async () => {
+  if (!receiptContainer.value) return;
+  exportingImage.value = true;
+  try {
+    const canvas = await html2canvas(receiptContainer.value, {
+      backgroundColor: '#fffdf9',
+      scale: 2,
+      useCORS: true,
+      logging: false
+    });
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = `pondo-receipt-${displayTitle.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+    link.href = dataUrl;
+    link.click();
+  } catch (err) {
+    console.error('Failed to export receipt image:', err);
+  } finally {
+    exportingImage.value = false;
+  }
+};
 
 const resetAllocations = () => {
   if (!commoditiesList.value) return;
@@ -60,6 +156,7 @@ onMounted(async () => {
   if (anomalies.value.length > 0) {
     selectedAnomalyId.value = anomalies.value[0].id;
     await fetchConversion(selectedAnomalyId.value);
+    await fetchCommunityConsensus();
   }
 });
 
@@ -376,6 +473,27 @@ const shareAllocationReceipt = async () => {
 
       <!-- Left Column: Controls & Context -->
       <section class="flex flex-col gap-6 lg:col-span-1">
+        <!-- Region Settings Card -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+          <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2 uppercase tracking-wider">
+            <Sliders class="w-4 h-4 text-blue-900" />
+            Regional Settings
+          </h2>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            Select region to localize conversion values (like daily minimum wages and local food prices).
+          </p>
+          <div class="mt-4">
+            <label for="region-select"
+              class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Active Region</label>
+            <select id="region-select" v-model="selectedRegion"
+              class="w-full border border-slate-300 rounded-xl py-2.5 px-4 text-sm font-semibold focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-white">
+              <option value="NCR">National Capital Region (NCR)</option>
+              <option value="Region VII">Region VII (Central Visayas - Cebu)</option>
+              <option value="Region XI">Region XI (Davao Region)</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Mode 1: Anomaly Selector -->
         <div v-if="!isCustomMode" class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
           <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -612,7 +730,7 @@ const shareAllocationReceipt = async () => {
           <div v-else>
             <!-- Tab 1: The Monospace Thermal Receipt Theme -->
             <div v-if="activeTab === 'receipt'" class="flex flex-col gap-4">
-              <div
+              <div ref="receiptContainer"
                 class="relative bg-amber-50/20 text-slate-800 font-mono p-5 md:p-7 rounded-2xl border border-slate-200/60 shadow-xs">
                 <!-- Thermal paper jagged top simulator -->
                 <div class="border-t-4 border-dashed border-slate-300 pt-5">
@@ -632,7 +750,7 @@ const shareAllocationReceipt = async () => {
                   </div>
 
                   <!-- Filter & Sort Toolbar for Receipt -->
-                  <div
+                  <div data-html2canvas-ignore
                     class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 rounded-xl p-3 mb-4 font-sans text-xs">
                     <!-- Filter Pills -->
                     <div class="flex flex-wrap items-center gap-1">
@@ -715,16 +833,22 @@ const shareAllocationReceipt = async () => {
                       displayAmount.toString().substring(0, 6) }}</span>
                   </div>
 
-                  <!-- Share Receipt Button at the Bottom -->
-                  <div class="mt-6 pt-4 border-t border-dashed border-slate-200">
+                  <!-- Share Receipt Actions at the Bottom -->
+                  <div data-html2canvas-ignore
+                    class="mt-6 pt-4 border-t border-dashed border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
                     <button @click="shareReceipt" :class="[
-                      'w-full py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer font-sans',
+                      'w-full py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer',
                       copied
                         ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                         : 'bg-slate-900 border-slate-900 text-white hover:bg-slate-800 shadow-xs'
                     ]">
                       <Share2 class="w-3.5 h-3.5" />
-                      {{ copied ? 'Copied to Clipboard! 📋' : 'Share Receipt' }}
+                      {{ copied ? 'Copied Text! 📋' : 'Copy Text' }}
+                    </button>
+                    <button @click="downloadReceiptImage" :disabled="exportingImage"
+                      class="w-full py-2.5 bg-blue-900 border border-blue-900 text-white hover:bg-blue-800 disabled:opacity-50 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer">
+                      <Camera class="w-3.5 h-3.5" />
+                      {{ exportingImage ? 'Generating PNG...' : 'Download PNG Receipt' }}
                     </button>
                   </div>
                 </div>
@@ -841,10 +965,10 @@ const shareAllocationReceipt = async () => {
                 </div>
               </div>
 
-              <!-- Share Reallocation Button at the Bottom -->
-              <div class="mt-4 pt-4 border-t border-slate-100">
+              <!-- Share & Publish Actions at the Bottom -->
+              <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
                 <button @click="shareAllocationReceipt" :class="[
-                  'w-full py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer font-sans',
+                  'w-full py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer',
                   copied
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                     : 'bg-slate-900 border-slate-900 text-white hover:bg-slate-800 shadow-xs'
@@ -852,6 +976,44 @@ const shareAllocationReceipt = async () => {
                   <Share2 class="w-3.5 h-3.5" />
                   {{ copied ? 'Copied to Clipboard! 📋' : 'Share Reallocation' }}
                 </button>
+
+                <button v-if="!isCustomMode" @click="publishReallocation" :disabled="publishedSuccess" :class="[
+                  'w-full py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border cursor-pointer',
+                  publishedSuccess
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    : 'bg-blue-900 border-blue-900 text-white hover:bg-blue-800'
+                ]">
+                  <Users class="w-3.5 h-3.5" />
+                  {{ publishedSuccess ? 'Published Successfully! 🗳️' : 'Publish Reallocation' }}
+                </button>
+              </div>
+
+              <!-- Community Consensus Aggregated Dashboard -->
+              <div v-if="!isCustomMode && communitySubmissionsCount > 0"
+                class="bg-blue-50 border border-blue-100 rounded-2xl p-5 mt-6 font-sans">
+                <h3 class="text-sm font-bold text-blue-900 flex items-center gap-2 mb-2">
+                  <Users class="w-4 h-4 text-blue-900" />
+                  Community Consensus ({{ communitySubmissionsCount }} submissions)
+                </h3>
+                <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                  Average percentage of budget allocated by other citizens for this contract:
+                </p>
+                <div class="space-y-3.5">
+                  <div v-for="item in commoditiesList" :key="'consensus-' + item.id" class="text-xs">
+                    <div class="flex justify-between font-bold text-slate-700 mb-1">
+                      <span>{{ item.display_unit_name }}</span>
+                      <span>{{ communityAverages[item.name] || 0 }}%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden flex">
+                      <div class="bg-blue-900 h-full rounded-full transition-all duration-300"
+                        :style="{ width: (communityAverages[item.name] || 0) + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else-if="!isCustomMode"
+                class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 mt-6 text-center text-xs text-slate-500 font-sans">
+                No community allocations published yet. Be the first to submit!
               </div>
             </div>
           </div>

@@ -60,7 +60,7 @@ async function main() {
             source_url: "https://www.dti.gov.ph"
         },
         {
-            name: "Daily Minimum Wage (NCR)",
+            name: "Daily Minimum Wage",
             category: "Labor",
             base_price_php: 610.0,
             unit_of_measurement: "day",
@@ -102,19 +102,74 @@ async function main() {
             icon_slug: "healthcare",
             effective_date: new Date("2026-05-01"),
             source_url: "https://www.philhealth.gov.ph"
+        },
+        // --- Region VII (Central Visayas - Cebu) Regional Commodities ---
+        {
+            name: "Well-Milled Rice",
+            category: "Agriculture/Food",
+            base_price_php: 55.0,
+            unit_of_measurement: "kg",
+            base_unit_multiplier: 50.0,
+            display_unit_name: "50kg Sack of Well-Milled Rice",
+            icon_slug: "rice-sack",
+            effective_date: new Date("2026-05-01"),
+            region: "Region VII",
+            source_url: "https://www.da.gov.ph"
+        },
+        {
+            name: "Daily Minimum Wage",
+            category: "Labor",
+            base_price_php: 468.0,
+            unit_of_measurement: "day",
+            base_unit_multiplier: 1.0,
+            display_unit_name: "Days of Minimum Wage (Cebu)",
+            icon_slug: "daily-wage",
+            effective_date: new Date("2026-05-01"),
+            region: "Region VII",
+            source_url: "https://www.dole.gov.ph"
+        },
+        // --- Region XI (Davao) Regional Commodities ---
+        {
+            name: "Well-Milled Rice",
+            category: "Agriculture/Food",
+            base_price_php: 54.5,
+            unit_of_measurement: "kg",
+            base_unit_multiplier: 50.0,
+            display_unit_name: "50kg Sack of Well-Milled Rice",
+            icon_slug: "rice-sack",
+            effective_date: new Date("2026-05-01"),
+            region: "Region XI",
+            source_url: "https://www.da.gov.ph"
+        },
+        {
+            name: "Daily Minimum Wage",
+            category: "Labor",
+            base_price_php: 481.0,
+            unit_of_measurement: "day",
+            base_unit_multiplier: 1.0,
+            display_unit_name: "Days of Minimum Wage (Davao)",
+            icon_slug: "daily-wage",
+            effective_date: new Date("2026-05-01"),
+            region: "Region XI",
+            source_url: "https://www.dole.gov.ph"
         }
     ];
 
     for (const c of commodities) {
+        const isRegional = c.name.includes("Rice") || c.name.includes("Wage");
+        const region = c.region || (isRegional ? "NCR" : "National");
+        const cWithRegion = { ...c, region };
+
         await prisma.commodity.upsert({
             where: {
-                name_effective_date: {
+                name_effective_date_region: {
                     name: c.name,
-                    effective_date: c.effective_date
+                    effective_date: c.effective_date,
+                    region: region
                 }
             },
             update: {},
-            create: c
+            create: cWithRegion
         });
     }
     console.log(`Upserted ${commodities.length} commodities.`);

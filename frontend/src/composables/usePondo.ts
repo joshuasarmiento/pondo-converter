@@ -15,6 +15,7 @@ export function usePondo() {
   const isCustomMode = ref<boolean>(false);
   const customAmount = ref<number>(10000000); // Default: 10 Million PHP
   const commoditiesList = ref<Commodity[]>([]);
+  const selectedRegion = ref<string>('NCR');
 
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
@@ -53,92 +54,13 @@ export function usePondo() {
   // Fetch commodities for the custom calculator
   const fetchCommodities = async () => {
     try {
-      commoditiesList.value = [
-        {
-          id: '1',
-          name: "Well-Milled Rice",
-          category: "Agriculture/Food",
-          base_price_php: 52.0,
-          unit_of_measurement: "kg",
-          base_unit_multiplier: 50.0,
-          display_unit_name: "50kg Sack of Well-Milled Rice",
-          icon_slug: "rice-sack",
-          effective_date: "2026-05-01",
-          source_url: "https://www.da.gov.ph"
-        },
-        {
-          id: '2',
-          name: "Canned Sardines",
-          category: "Food & Groceries",
-          base_price_php: 22.0,
-          unit_of_measurement: "can",
-          base_unit_multiplier: 1.0,
-          display_unit_name: "Can of Sardines (155g)",
-          icon_slug: "sardines-can",
-          effective_date: "2026-05-01",
-          source_url: "https://www.dti.gov.ph"
-        },
-        {
-          id: '3',
-          name: "Instant Noodles",
-          category: "Food & Groceries",
-          base_price_php: 9.50,
-          unit_of_measurement: "pack",
-          base_unit_multiplier: 1.0,
-          display_unit_name: "Instant Noodle Packet",
-          icon_slug: "noodles-pack",
-          effective_date: "2026-05-01",
-          source_url: "https://www.dti.gov.ph"
-        },
-        {
-          id: '4',
-          name: "Daily Minimum Wage (NCR)",
-          category: "Labor",
-          base_price_php: 610.0,
-          unit_of_measurement: "day",
-          base_unit_multiplier: 1.0,
-          display_unit_name: "Days of Minimum Wage (NCR)",
-          icon_slug: "daily-wage",
-          effective_date: "2026-05-01",
-          source_url: "https://www.dole.gov.ph"
-        },
-        {
-          id: '5',
-          name: "Classroom Construction",
-          category: "Infrastructure/Education",
-          base_price_php: 2500000.0,
-          unit_of_measurement: "classroom",
-          base_unit_multiplier: 1.0,
-          display_unit_name: "Standard Public School Classrooms",
-          icon_slug: "classroom",
-          effective_date: "2026-05-01",
-          source_url: "https://www.deped.gov.ph"
-        },
-        {
-          id: '6',
-          name: "DepEd Textbook",
-          category: "Education",
-          base_price_php: 150.0,
-          unit_of_measurement: "book",
-          base_unit_multiplier: 1.0,
-          display_unit_name: "Public School Textbooks",
-          icon_slug: "textbook",
-          effective_date: "2026-05-01",
-          source_url: "https://www.deped.gov.ph"
-        },
-        {
-          id: '7',
-          name: "PhilHealth Monthly Premium",
-          category: "Healthcare",
-          base_price_php: 500.0,
-          unit_of_measurement: "month",
-          base_unit_multiplier: 1.0,
-          display_unit_name: "Months of PhilHealth Coverage",
-          icon_slug: "healthcare",
-          effective_date: "2026-05-01",
-          source_url: "https://www.philhealth.gov.ph"
+      const res = await fetch(`${API_URL}/commodities?region=${selectedRegion.value}`, {
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`
         }
-      ];
+      });
+      if (!res.ok) throw new Error('Failed to fetch commodities list.');
+      commoditiesList.value = await res.json();
     } catch (err) {
       console.error('Failed to prepare commodities list.', err);
     }
@@ -150,7 +72,7 @@ export function usePondo() {
     loading.value = true;
     error.value = null;
     try {
-      const res = await fetch(`${API_URL}/convert/${anomalyId}`, {
+      const res = await fetch(`${API_URL}/convert/${anomalyId}?region=${selectedRegion.value}`, {
         headers: {
           'Authorization': `Bearer ${API_KEY}`
         }
@@ -179,6 +101,14 @@ export function usePondo() {
     }
   });
 
+  // Listen to region changes to refetch details
+  watch(selectedRegion, async () => {
+    if (selectedAnomalyId.value && !isCustomMode.value) {
+      await fetchConversion(selectedAnomalyId.value);
+    }
+    await fetchCommodities();
+  });
+
   return {
     anomalies,
     selectedAnomalyId,
@@ -187,6 +117,7 @@ export function usePondo() {
     isCustomMode,
     customAmount,
     commoditiesList,
+    selectedRegion,
     loading,
     error,
     fetchAnomalies,

@@ -179,9 +179,10 @@ async function runDAIngestion() {
         try {
             await prisma.commodity.upsert({
                 where: {
-                    name_effective_date: {
+                    name_effective_date_region: {
                         name: normalizedName,
-                        effective_date: effectiveDate
+                        effective_date: effectiveDate,
+                        region: 'NCR'
                     }
                 },
                 update: {
@@ -191,11 +192,12 @@ async function runDAIngestion() {
                     name: normalizedName,
                     category: category,
                     base_price_php: priceFloat,
-                    unit_of_measurement: isRice ? 'kg' : 'pcs',
+                    unit_of_measurement: 'kg',
                     base_unit_multiplier: base_unit_multiplier,
                     display_unit_name: display_unit_name,
                     icon_slug: icon_slug,
                     effective_date: effectiveDate,
+                    region: 'NCR',
                     source_url: latestLink.url
                 }
             });

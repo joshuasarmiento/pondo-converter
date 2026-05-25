@@ -77,7 +77,7 @@ const ESSENTIAL_COMMODITIES = [
     "Well-Milled Rice",
     "Canned Sardines",
     "Instant Noodles",
-    "Daily Minimum Wage (NCR)",
+    "Daily Minimum Wage",
     "Classroom Construction",
     "DepEd Textbook",
     "PhilHealth Monthly Premium"
@@ -95,12 +95,18 @@ app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
 
         if (!anomaly) return res.status(404).json({ error: 'Anomaly not found' });
 
+        const { region } = req.query;
+        const activeRegion = region || 'NCR';
+
         // Fetch the latest prices for our standard basket of goods
         // Using a raw query or distinct to get the most recent entries per commodity name
         const latestCommodities = await prisma.commodity.findMany({
             where: {
                 name: {
                     in: ESSENTIAL_COMMODITIES
+                },
+                region: {
+                    in: [activeRegion, 'National']
                 }
             },
             orderBy: { effective_date: 'desc' },
@@ -149,10 +155,16 @@ app.get('/api/convert/:anomalyId', authenticate, async (req, res) => {
 // 3. Get List of Commodities (For the UI prices directory)
 app.get('/api/commodities', authenticate, async (req, res) => {
     try {
+        const { region } = req.query;
+        const activeRegion = region || 'NCR';
+
         const latestCommodities = await prisma.commodity.findMany({
             where: {
                 name: {
                     in: ESSENTIAL_COMMODITIES
+                },
+                region: {
+                    in: [activeRegion, 'National']
                 }
             },
             orderBy: { effective_date: 'desc' },
@@ -162,6 +174,148 @@ app.get('/api/commodities', authenticate, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch commodities' });
+    }
+});
+
+// 4. Save User Budget Reallocation
+app.post('/api/reallocations', authenticate, async (req, res) => {
+    try {
+        const { anomalyId, allocations } = req.body;
+        if (!anomalyId || !allocations) {
+            return res.status(400).json({ error: 'Missing anomalyId or allocations' });
+        }
+
+        const reallocation = await prisma.reallocation.create({
+            data: {
+                anomalyId,
+                allocations: typeof allocations === 'string' ? allocations : JSON.stringify(allocations)
+            }
+        });
+        res.json(reallocation);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to save reallocation' });
+    }
+});
+
+// 5. Get Aggregated "People's Budget" Consensus for a specific anomaly
+app.get('/api/reallocations/:anomalyId', authenticate, async (req, res) => {
+    try {
+        const { anomalyId } = req.params;
+        const submissions = await prisma.reallocation.findMany({
+            where: { anomalyId }
+        });
+
+        if (!submissions.length) {
+            return res.json({ totalSubmissions: 0, averages: {} });
+        }
+
+        // Aggregate allocations
+        const totals = {};
+        let count = 0;
+
+        submissions.forEach(sub => {
+            try {
+                const alloc = JSON.parse(sub.allocations);
+                Object.keys(alloc).forEach(key => {
+                    totals[key] = (totals[key] || 0) + parseFloat(alloc[key]);
+                });
+                count++;
+            } catch (e) {
+                // Ignore parsing errors
+            }
+        });
+
+        const averages = {};
+        if (count > 0) {
+            Object.keys(totals).forEach(key => {
+                averages[key] = Math.round((totals[key] / count) * 10) / 10; // 1 decimal place
+            });
+        }
+
+        res.json({
+            totalSubmissions: count,
+            averages
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to aggregate reallocations' });
+    }
+});
+
+// 6. Civic Transparency Dashboard Analytics
+app.get('/api/analytics', authenticate, async (req, res) => {
+    try {
+        const anomalies = await prisma.anomaly.findMany();
+        const totalContractAmount = anomalies.reduce((sum, item) => sum + item.contract_amount_php, 0);
+        
+        // Agency leaderboard
+        const agencyMap = {};
+        anomalies.forEach(item => {
+            agencyMap[item.agency] = (agencyMap[item.agency] || 0) + item.contract_amount_php;
+        });
+        const agencyLeaderboard = Object.keys(agencyMap).map(name => ({
+            name,
+            total_amount_php: agencyMap[name]
+        })).sort((a, b) => b.total_amount_php - a.total_amount_php).slice(0, 5);
+
+        // Contractor leaderboard
+        const contractorMap = {};
+        anomalies.forEach(item => {
+            if (item.contractor_name) {
+                contractorMap[item.contractor_name] = (contractorMap[item.contractor_name] || 0) + item.contract_amount_php;
+            }
+        });
+        const contractorLeaderboard = Object.keys(contractorMap).map(name => ({
+            name,
+            total_amount_php: contractorMap[name]
+        })).sort((a, b) => b.total_amount_php - a.total_amount_php).slice(0, 5);
+
+        // Fetch latest commodities to convert total sum into national equivalents
+        const latestCommodities = await prisma.commodity.findMany({
+            where: {
+                name: {
+                    in: ESSENTIAL_COMMODITIES
+                },
+                region: 'NCR' // standard NCR wage/rice for baseline national stats
+            },
+            orderBy: { effective_date: 'desc' },
+            distinct: ['name']
+        });
+
+        // Add national specific ones
+        const nationalSpecific = await prisma.commodity.findMany({
+            where: {
+                name: {
+                    in: ESSENTIAL_COMMODITIES
+                },
+                region: 'National'
+            },
+            orderBy: { effective_date: 'desc' },
+            distinct: ['name']
+        });
+
+        const combinedCommodities = [...latestCommodities, ...nationalSpecific];
+
+        const nationalEquivalents = combinedCommodities.map(item => {
+            const unitCost = item.base_price_php * item.base_unit_multiplier;
+            return {
+                metric_name: item.display_unit_name,
+                quantity_equivalent: Math.floor(totalContractAmount / unitCost),
+                icon_slug: item.icon_slug
+            };
+        });
+
+        res.json({
+            total_contract_amount_php: totalContractAmount,
+            total_anomalies_count: anomalies.length,
+            agency_leaderboard: agencyLeaderboard,
+            contractor_leaderboard: contractorLeaderboard,
+            national_equivalents: nationalEquivalents.sort((a, b) => b.quantity_equivalent - a.quantity_equivalent)
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to load analytics' });
     }
 });
 

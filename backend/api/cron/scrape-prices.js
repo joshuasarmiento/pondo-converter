@@ -156,13 +156,13 @@ async function runDAIngestion() {
 
     try {
       await prisma.commodity.upsert({
-        where: { name_effective_date: { name: normalizedName, effective_date: effectiveDate } },
+        where: { name_effective_date_region: { name: normalizedName, effective_date: effectiveDate, region: 'NCR' } },
         update: { base_price_php: priceFloat },
         create: {
           name: normalizedName, category, base_price_php: priceFloat,
           unit_of_measurement: 'kg',
           base_unit_multiplier, display_unit_name, icon_slug,
-          effective_date: effectiveDate, source_url: latestLink.url
+          effective_date: effectiveDate, region: 'NCR', source_url: latestLink.url
         }
       });
       upsertCount++;

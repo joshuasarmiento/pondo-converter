@@ -17,11 +17,12 @@ model Commodity {
   display_unit_name    String
   icon_slug            String
   effective_date       DateTime
+  region               String   @default("NCR")
   source_url           String?
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  @@unique([name, effective_date])
+  @@unique([name, effective_date, region])
 }
 
 model Anomaly {
@@ -36,4 +37,11 @@ model Anomaly {
   status                String    @default("Awarded")
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+}
+
+model Reallocation {
+  id          String   @id @default(uuid())
+  anomalyId   String
+  allocations String   // JSON string of name -> quantity
+  createdAt   DateTime @default(now())
 }

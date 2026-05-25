@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Wheat, Coins, Briefcase, School, BookOpen, Heart, Layers, Calendar, Landmark, Info } from 'lucide-vue-next';
+import { ref, onMounted, watch } from 'vue';
+import { Wheat, Coins, Briefcase, School, BookOpen, Heart, Layers, Calendar, Landmark, Info, Sliders } from 'lucide-vue-next';
 import type { Commodity } from '../types';
 
 const API_URL = 'http://localhost:3001/api';
@@ -9,16 +9,21 @@ const API_KEY = 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdy
 const commodities = ref<Commodity[]>([]);
 const loading = ref<boolean>(false);
 const error = ref<string | null>(null);
+const selectedRegion = ref<string>('NCR');
 
 onMounted(async () => {
   await fetchCommodityPrices();
+});
+
+watch(selectedRegion, () => {
+  fetchCommodityPrices();
 });
 
 const fetchCommodityPrices = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const res = await fetch(`${API_URL}/commodities`, {
+    const res = await fetch(`${API_URL}/commodities?region=${selectedRegion.value}`, {
       headers: {
         'Authorization': `Bearer ${API_KEY}`
       }
@@ -70,6 +75,24 @@ const getIcon = (slug: string) => {
       </p>
     </div>
 
+    <!-- Region Selector Bar -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <Sliders class="w-4.5 h-4.5 text-blue-900" />
+        <div>
+          <span class="font-bold text-sm text-slate-900 block">Regional Filtering</span>
+          <span class="text-xs text-slate-500">Showing commodity prices for the selected region.</span>
+        </div>
+      </div>
+      <div class="w-full sm:w-72">
+        <select id="region-prices-select" v-model="selectedRegion" class="w-full border border-slate-300 rounded-xl py-2 px-3 text-xs font-semibold focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-white">
+          <option value="NCR">National Capital Region (NCR)</option>
+          <option value="Region VII">Region VII (Central Visayas - Cebu)</option>
+          <option value="Region XI">Region XI (Davao Region)</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Info Banner -->
     <div
       class="bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5 mb-6 md:mb-8 flex gap-3 md:gap-4 items-start text-slate-700 text-xs leading-relaxed">
@@ -82,7 +105,7 @@ const getIcon = (slug: string) => {
           </span>
           <span class="text-emerald-700 text-[11px]">Live Data Active</span>
         </h4>
-        Food prices (like rice) are sourced from Department of Agriculture (DA) price updates. Industrial parameters like NCR Minimum Wages and classroom construction costs are based on DOLE and DepEd reports.
+        Food prices (like rice) are sourced from Department of Agriculture (DA) price updates. Industrial parameters like Minimum Wages and classroom construction costs are based on DOLE and DepEd reports.
       </div>
     </div>
 
