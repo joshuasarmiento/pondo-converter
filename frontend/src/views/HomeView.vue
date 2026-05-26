@@ -59,7 +59,7 @@ const fetchCommunityConsensus = async () => {
   if (isCustomMode.value || !selectedAnomalyId.value) return;
   loadingCommunityConsensus.value = true;
   try {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://pondo-converter-yvw8.vercel.app/api';
     const API_KEY = import.meta.env.VITE_API_KEY || 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
     const res = await fetch(`${API_URL}/reallocations/${selectedAnomalyId.value}`, {
       headers: {
@@ -80,7 +80,7 @@ const fetchCommunityConsensus = async () => {
 const publishReallocation = async () => {
   if (isCustomMode.value || !selectedAnomalyId.value) return;
   try {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://pondo-converter-yvw8.vercel.app/api';
     const API_KEY = import.meta.env.VITE_API_KEY || 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
 
     // Calculate percentage allocations for each item

@@ -3,8 +3,8 @@ import { ref, onMounted, watch } from 'vue';
 import { Wheat, Coins, Briefcase, School, BookOpen, Heart, Layers, Calendar, Landmark, Info, Sliders } from 'lucide-vue-next';
 import type { Commodity } from '../types';
 
-const API_URL = 'http://localhost:3001/api';
-const API_KEY = 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
+const API_URL = import.meta.env.VITE_API_URL || 'https://pondo-converter-yvw8.vercel.app/api';
+const API_KEY = import.meta.env.VITE_API_KEY || 'COqDemyg9y4sCN3VYhuxJyGkhnMDcwLpavcSAWRnGL99ZfToaHpWOoBcNVqmgdyT';
 
 const commodities = ref<Commodity[]>([]);
 const loading = ref<boolean>(false);
